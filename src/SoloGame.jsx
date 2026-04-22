@@ -23,6 +23,8 @@ export default function SoloGame({ onBackToMenu }) {
   const [rouletteHit, setRouletteHit] = useState(false);
   const [chambers, setChambers] = useState([0, 0, 0, 0]);
   const chambersRef = useRef([0, 0, 0, 0]);
+  const lastPRef = useRef(null);
+  const lastCardsRef = useRef([]);
   const [log, setLog] = useState([]);
   const [emotes, setEmotes] = useState([]);
   const [showEm, setShowEm] = useState(false);
@@ -78,6 +80,7 @@ export default function SoloGame({ onBackToMenu }) {
     chambersRef.current = [0, 0, 0, 0];
     setChambers([0, 0, 0, 0]);
     setPile([]); setRoundCard(null); setLastP(null); setLastCards([]);
+    lastPRef.current = null; lastCardsRef.current = [];
     setSel([]); setLog(["═══ Partie lancée ═══"]); setEmotes([]);
     setWinner(null); setRevealed(null); setPlayInd(null);
     setGs("playing"); setCp(0);
@@ -86,6 +89,7 @@ export default function SoloGame({ onBackToMenu }) {
 
   const newRound = useCallback((pl, from) => {
     setPile([]); setLastP(null); setLastCards([]);
+    lastPRef.current = null; lastCardsRef.current = [];
     setSel([]); setRevealed(null); setPlayInd(null);
     const d = deal(pl);
     setPlayers(d);
@@ -148,7 +152,7 @@ export default function SoloGame({ onBackToMenu }) {
     const nh = p.hand.filter((_, i) => !sel.includes(i));
     const ok = legit(cards, roundCard);
     setPile((prev) => [...prev, ...cards]);
-    setLastP(0); setLastCards(cards); setSel([]);
+    setLastP(0); setLastCards(cards); lastPRef.current = 0; lastCardsRef.current = cards; setSel([]);
     showPlayIndicator(0, cards.length);
     addLog(`Vous posez ${cards.length} carte(s) ${ok ? "✓" : "🤥"}`);
     if (!ok && Math.random() > 0.6) emote(0, "😏");
@@ -182,7 +186,7 @@ export default function SoloGame({ onBackToMenu }) {
     else ctp = b.hand.slice(0, cnt);
     const nh = b.hand.filter((c) => !ctp.includes(c)), ok = legit(ctp, rCard);
     setPile((prev) => [...prev, ...ctp]);
-    setLastP(bi); setLastCards(ctp);
+    setLastP(bi); setLastCards(ctp); lastPRef.current = bi; lastCardsRef.current = ctp;
     showPlayIndicator(bi, cnt);
     addLog(`${b.name} pose ${cnt} carte(s)`);
     if (Math.random() > 0.6) emote(bi, !ok && Math.random() > 0.4 ? "😏" : EMOTES[Math.floor(Math.random() * EMOTES.length)]);
@@ -195,27 +199,29 @@ export default function SoloGame({ onBackToMenu }) {
     const b = pl[bi];
     if (!b?.alive) return;
     const rCard = rc || roundCard;
-    if (lastP !== null && lastP !== bi && lastCards.length > 0) {
+    const lp = lastPRef.current;
+    const lc = lastCardsRef.current;
+    if (lp !== null && lp !== bi && lc.length > 0) {
       const own = b.hand.filter((c) => c.type === rCard || c.type === "Joker").length;
-      let sus = 0.15 + lastCards.length * 0.1;
+      let sus = 0.15 + lc.length * 0.1;
       if (own >= 3) sus += 0.2;
       if (own >= 5) sus += 0.15;
       if (Math.random() < sus) {
         setPlayInd(null);
-        const was = !legit(lastCards, rCard);
+        const was = !legit(lc, rCard);
         addLog(`${b.name} appelle MENTEUR !`);
-        setRevealed({ cards: lastCards, player: lastP });
-        addLog(`→ Cartes: ${lastCards.map((c) => c.type).join(", ")}`);
+        setRevealed({ cards: lc, player: lp });
+        addLog(`→ Cartes: ${lc.map((c) => c.type).join(", ")}`);
         setTimeout(() => {
           setRevealed(null);
-          if (was) { addLog(`→ ${PLAYER_NAMES[lastP]} mentait !`); trigRoulette(lastP); }
+          if (was) { addLog(`→ ${PLAYER_NAMES[lp]} mentait !`); trigRoulette(lp); }
           else { addLog(`→ Vrai ! ${b.name} tire...`); trigRoulette(bi); }
         }, 1800);
         return;
       }
     }
     botPlay(bi, pl, rCard);
-  }, [roundCard, lastP, lastCards, legit, addLog, trigRoulette, botPlay]);
+  }, [roundCard, legit, addLog, trigRoulette, botPlay]);
 
   const rouletteDone = useCallback((died) => {
     const pi = rouletteP;
