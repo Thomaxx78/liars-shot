@@ -407,7 +407,7 @@ export default function OnlineGame({ onBackToMenu }) {
       </div>
 
       {/* Log */}
-      <div style={{ position: "absolute", top: 44, left: 8, width: 240, maxHeight: 260, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
+      <div style={{ position: "absolute", top: 44, left: 8, width: 290, maxHeight: "calc(100vh - 210px)", overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
         {log.map((l, i) => (
           <div key={i} style={{ fontSize: 11, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
