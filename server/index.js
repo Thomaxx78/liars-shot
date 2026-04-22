@@ -449,7 +449,7 @@ io.on("connection", (socket) => {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distPath = join(__dirname, "../dist");
 app.use(express.static(distPath));
-app.get("*", (_, res) => res.sendFile(join(distPath, "index.html")));
+app.use((_, res) => res.sendFile(join(distPath, "index.html")));
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => console.log(`🤠 Liar's Shot server on port ${PORT}`));
