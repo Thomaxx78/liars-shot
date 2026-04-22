@@ -31,12 +31,20 @@ export default function SoloGame({ onBackToMenu }) {
   const [showAnn, setShowAnn] = useState(false);
   const [revealed, setRevealed] = useState(null);
   const [playInd, setPlayInd] = useState(null);
+  const [deckCounts, setDeckCounts] = useState(null);
   const timerRef = useRef(null);
   const botRef = useRef(null);
 
   useEffect(() => { chambersRef.current = chambers; }, [chambers]);
 
   const addLog = useCallback((m) => setLog((p) => [...p.slice(-10), m]), []);
+  const computeDeckCounts = useCallback((pl) => {
+    const n = pl.filter((p) => p.alive).length;
+    const handSize = n <= 5 ? 4 : 3;
+    const total = n * handSize;
+    const reg = Math.ceil(total / 4);
+    return { Roi: reg, Dame: reg, Valet: reg, Joker: total - 3 * reg };
+  }, []);
   const alive = (pl) => pl.filter((p) => p.alive).length;
   const nextAlive = useCallback((f, pl) => {
     let n = (f + 1) % 4, s = 0;
@@ -66,6 +74,7 @@ export default function SoloGame({ onBackToMenu }) {
     const base = Array.from({ length: 4 }, (_, i) => ({ id: i, name: PLAYER_NAMES[i], hand: [], alive: true, isHuman: i === 0 }));
     const d = deal(base);
     setPlayers(d);
+    setDeckCounts(computeDeckCounts(base));
     chambersRef.current = [0, 0, 0, 0];
     setChambers([0, 0, 0, 0]);
     setPile([]); setRoundCard(null); setLastP(null); setLastCards([]);
@@ -80,10 +89,11 @@ export default function SoloGame({ onBackToMenu }) {
     setSel([]); setRevealed(null); setPlayInd(null);
     const d = deal(pl);
     setPlayers(d);
+    setDeckCounts(computeDeckCounts(pl));
     addLog("═══ Nouveau round ═══");
     setCp(from);
     setTimeout(() => setShowAnn(true), 700);
-  }, [deal, addLog]);
+  }, [deal, addLog, computeDeckCounts]);
 
   const annDone = useCallback((card) => {
     setRoundCard(card); setShowAnn(false);
@@ -309,7 +319,10 @@ export default function SoloGame({ onBackToMenu }) {
       <style>{CSS}</style>
       <WesternBarBG />
       <div style={{ padding: "8px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(26,18,8,0.8)", borderBottom: `1px solid ${T.goldDim}15`, zIndex: 10 }}>
-        <span style={{ fontSize: 14, color: T.goldDim, letterSpacing: 2 }}>Solo</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 14, color: T.goldDim, letterSpacing: 2 }}>Solo</span>
+          <button onClick={onBackToMenu} style={{ fontFamily: "'Press Start 2P'", fontSize: 6, padding: "4px 8px", background: "transparent", color: T.textDim, border: `1px solid ${T.textDim}30`, cursor: "pointer", borderRadius: 2 }}>← Quitter</button>
+        </div>
         {roundCard && <div style={{ fontSize: 9, color: T.goldBright, padding: "3px 12px", border: `1px solid ${T.goldDim}40`, background: "rgba(0,0,0,0.4)", borderRadius: 2, fontFamily: "'Press Start 2P'", animation: "pulseGlow 2s infinite" }}>★ {roundCard}</div>}
         {timer !== null && <span style={{ fontSize: 12, fontFamily: "'Press Start 2P'", color: timer <= 5 ? T.redBright : T.goldBright, animation: timer <= 5 ? "blink 0.5s infinite" : "none", textShadow: timer <= 5 ? `0 0 8px ${T.redBright}` : "none" }}>⏱ {timer}s</span>}
         <span style={{ fontSize: 8, color: T.textDim, fontFamily: "'Press Start 2P'" }}>☠ {4 - alive(players)}</span>
@@ -332,13 +345,14 @@ export default function SoloGame({ onBackToMenu }) {
             </div>
           )}
           {players.map((p, i) => {
-            const a = [Math.PI / 2, Math.PI, -Math.PI / 2, 0][i];
+            const a = [-Math.PI / 2, 0, Math.PI / 2, Math.PI][i];
             const cx = Math.cos(a) * 300, cy = -Math.sin(a) * 300;
+            const isCurrent = cp === i && !showAnn;
             return (
-              <div key={i} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: 5 }}>
-                <CowboySprite playerIdx={i} size={38} eliminated={!p.alive} isCurrent={cp === i && !showAnn} emotion={emotes.some((e) => e.player === i) ? "smirk" : "neutral"} />
+              <div key={i} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: isCurrent ? 8 : 5, filter: isCurrent ? `drop-shadow(0 0 10px ${PT[i].primary}) drop-shadow(0 0 20px ${PT[i].primary}80)` : "none", transition: "filter 0.4s" }}>
+                <CowboySprite playerIdx={i} size={38} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === i) ? "smirk" : "neutral"} />
                 <span style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: PT[i].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>{p.name}</span>
-                <span style={{ fontSize: 6, color: p.alive ? T.textDim : T.redBright }}>{p.alive ? `🃏${p.hand.length}` : "💀"}</span>
+                <span style={{ fontSize: 9, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "1px 5px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.hand.length}` : "💀"}</span>
                 {p.alive && (
                   <div style={{ display: "flex", gap: 2 }}>
                     {Array.from({ length: CHAMBER_COUNT }, (_, ci) => (
@@ -354,11 +368,25 @@ export default function SoloGame({ onBackToMenu }) {
           })}
         </div>
       </div>
-      <div style={{ position: "absolute", top: 44, left: 8, width: 170, maxHeight: 170, overflow: "hidden", zIndex: 10 }}>
+      {/* Log */}
+      <div style={{ position: "absolute", top: 44, left: 8, width: 240, maxHeight: 260, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
         {log.map((l, i) => (
-          <div key={i} style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldDim : l.includes("💀") ? T.redBright : T.textDim, lineHeight: 2, animation: "slideInLog 0.3s", opacity: 0.3 + (i / log.length) * 0.7, textShadow: "1px 1px 0 #000" }}>{l}</div>
+          <div key={i} style={{ fontSize: 9, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
       </div>
+
+      {/* Deck composition */}
+      {deckCounts && (
+        <div style={{ position: "absolute", top: 44, right: 8, width: 130, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 10px" }}>
+          <div style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>DECK</div>
+          {[["Roi", "♠"], ["Dame", "♥"], ["Valet", "♦"], ["Joker", "🃏"]].map(([type, suit]) => (
+            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
+              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
+            </div>
+          ))}
+        </div>
+      )}
       {human?.alive && gs === "playing" && !showAnn && roundCard && (
         <div style={{ padding: "10px 16px 14px", background: "linear-gradient(180deg,rgba(26,18,8,0.3),rgba(26,18,8,0.92))", borderTop: `1px solid ${T.goldDim}12`, zIndex: 10 }}>
           <div style={{ display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
