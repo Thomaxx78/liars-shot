@@ -169,6 +169,7 @@ export default function OnlineGame({ onBackToMenu }) {
   const playCards = () => {
     if (sel.length === 0 || sel.length > 3) return;
     socketRef.current.emit("play_cards", { roomId: roomInfo.roomId, cardIndices: sel });
+    setMyHand((h) => h.filter((_, i) => !sel.includes(i)));
     setSel([]);
   };
 
@@ -338,7 +339,10 @@ export default function OnlineGame({ onBackToMenu }) {
 
       {/* Top bar */}
       <div style={{ padding: "8px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(26,18,8,0.8)", borderBottom: `1px solid ${T.goldDim}15`, zIndex: 10 }}>
-        <span style={{ fontSize: 10, color: T.goldDim, fontFamily: "'Press Start 2P'", letterSpacing: 1 }}>{roomInfo?.code}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 10, color: T.goldDim, fontFamily: "'Press Start 2P'", letterSpacing: 1 }}>{roomInfo?.code}</span>
+          <button onClick={onBackToMenu} style={{ fontFamily: "'Press Start 2P'", fontSize: 6, padding: "4px 8px", background: "transparent", color: T.textDim, border: `1px solid ${T.textDim}30`, cursor: "pointer", borderRadius: 2 }}>← Quitter</button>
+        </div>
         {roundCard && <div style={{ fontSize: 9, color: T.goldBright, padding: "3px 12px", border: `1px solid ${T.goldDim}40`, background: "rgba(0,0,0,0.4)", borderRadius: 2, fontFamily: "'Press Start 2P'", animation: "pulseGlow 2s infinite" }}>★ {roundCard}</div>}
         <span style={{ fontSize: 8, color: T.textDim, fontFamily: "'Press Start 2P'" }}>☠ {players.filter((p) => !p.alive).length}</span>
       </div>
@@ -373,7 +377,7 @@ export default function OnlineGame({ onBackToMenu }) {
                 <span style={{ fontSize: N > 5 ? 5 : 6, fontFamily: "'Press Start 2P'", color: PT[p.colorIdx % PT.length].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>
                   {p.name}{p.serverIdx === myIdx ? " ★" : ""}
                 </span>
-                <span style={{ fontSize: 6, color: p.alive ? T.textDim : T.redBright }}>{p.alive ? `🃏${p.handCount}` : "💀"}</span>
+                <span style={{ fontSize: N > 5 ? 7 : 9, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "1px 5px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.handCount}` : "💀"}</span>
                 {p.alive && (
                   <div style={{ display: "flex", gap: 2 }}>
                     {Array.from({ length: CHAMBER_COUNT }, (_, ci) => (
@@ -392,9 +396,9 @@ export default function OnlineGame({ onBackToMenu }) {
       </div>
 
       {/* Log */}
-      <div style={{ position: "absolute", top: 44, left: 8, width: 170, maxHeight: 170, overflow: "hidden", zIndex: 10 }}>
+      <div style={{ position: "absolute", top: 44, left: 8, width: 230, maxHeight: 240, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "4px 6px" }}>
         {log.map((l, i) => (
-          <div key={i} style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldDim : l.includes("💀") ? T.redBright : T.textDim, lineHeight: 2, animation: "slideInLog 0.3s", opacity: 0.3 + (i / log.length) * 0.7, textShadow: "1px 1px 0 #000" }}>{l}</div>
+          <div key={i} style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldDim : l.includes("💀") ? T.redBright : T.textDim, lineHeight: 2.2, animation: "slideInLog 0.3s", opacity: 0.3 + (i / log.length) * 0.7, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
       </div>
 
