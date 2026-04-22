@@ -346,17 +346,17 @@ export default function SoloGame({ onBackToMenu }) {
           )}
           {players.map((p, i) => {
             const a = [-Math.PI / 2, 0, Math.PI / 2, Math.PI][i];
-            const cx = Math.cos(a) * 300, cy = -Math.sin(a) * 300;
+            const cx = Math.cos(a) * 320, cy = -Math.sin(a) * 320;
             const isCurrent = cp === i && !showAnn;
             return (
               <div key={i} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: isCurrent ? 8 : 5, filter: isCurrent ? `drop-shadow(0 0 10px ${PT[i].primary}) drop-shadow(0 0 20px ${PT[i].primary}80)` : "none", transition: "filter 0.4s" }}>
-                <CowboySprite playerIdx={i} size={38} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === i) ? "smirk" : "neutral"} />
-                <span style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: PT[i].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>{p.name}</span>
-                <span style={{ fontSize: 9, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "1px 5px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.hand.length}` : "💀"}</span>
+                <CowboySprite playerIdx={i} size={52} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === i) ? "smirk" : "neutral"} />
+                <span style={{ fontSize: 9, fontFamily: "'Press Start 2P'", color: PT[i].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>{p.name}</span>
+                <span style={{ fontSize: 12, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "2px 6px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.hand.length}` : "💀"}</span>
                 {p.alive && (
-                  <div style={{ display: "flex", gap: 2 }}>
+                  <div style={{ display: "flex", gap: 3 }}>
                     {Array.from({ length: CHAMBER_COUNT }, (_, ci) => (
-                      <div key={ci} style={{ width: 5, height: 5, borderRadius: "50%", border: `1px solid ${ci < chambers[i] ? T.redBright : `${T.textDim}40`}`, background: ci < chambers[i] ? T.redBright : "transparent", boxShadow: ci < chambers[i] ? `0 0 3px ${T.redBright}60` : "none" }} />
+                      <div key={ci} style={{ width: 6, height: 6, borderRadius: "50%", border: `1px solid ${ci < chambers[i] ? T.redBright : `${T.textDim}40`}`, background: ci < chambers[i] ? T.redBright : "transparent", boxShadow: ci < chambers[i] ? `0 0 3px ${T.redBright}60` : "none" }} />
                     ))}
                   </div>
                 )}
@@ -371,18 +371,18 @@ export default function SoloGame({ onBackToMenu }) {
       {/* Log */}
       <div style={{ position: "absolute", top: 44, left: 8, width: 240, maxHeight: 260, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
         {log.map((l, i) => (
-          <div key={i} style={{ fontSize: 9, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
+          <div key={i} style={{ fontSize: 11, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
       </div>
 
       {/* Deck composition */}
       {deckCounts && (
-        <div style={{ position: "absolute", top: 44, right: 8, width: 130, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 10px" }}>
-          <div style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>DECK</div>
+        <div style={{ position: "absolute", top: 44, right: 8, width: 165, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "8px 12px" }}>
+          <div style={{ fontSize: 7, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 8, textAlign: "center" }}>DECK</div>
           {[["Roi", "♠"], ["Dame", "♥"], ["Valet", "♦"], ["Joker", "🃏"]].map(([type, suit]) => (
-            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
-              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
+            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
+              <span style={{ fontSize: 12, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
             </div>
           ))}
         </div>
@@ -418,7 +418,7 @@ export default function SoloGame({ onBackToMenu }) {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: "center", fontSize: 8, color: PT[cp]?.primary || T.textDim, fontFamily: "'Press Start 2P'", animation: "blink 1.2s infinite" }}>
+            <div style={{ textAlign: "center", fontSize: 10, color: PT[cp]?.primary || T.textDim, fontFamily: "'Press Start 2P'", animation: "blink 1.2s infinite" }}>
               {PLAYER_NAMES[cp]} réfléchit...
             </div>
           )}

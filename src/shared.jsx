@@ -254,13 +254,13 @@ export function PlayIndicator({ playerIdx, count, visible, name }) {
   const t = PT[playerIdx % PT.length];
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 14px", background: "rgba(0,0,0,0.75)", border: `1px solid ${t.primary}60`, borderRadius: 20, animation: "popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)", boxShadow: `0 4px 16px rgba(0,0,0,0.4), 0 0 8px ${t.primary}20` }}>
-      <span style={{ fontSize: 8, color: t.primary, fontFamily: "'Press Start 2P',monospace", fontWeight: "bold" }}>{name}</span>
+      <span style={{ fontSize: 11, color: t.primary, fontFamily: "'Press Start 2P',monospace", fontWeight: "bold" }}>{name}</span>
       <div style={{ display: "flex", gap: 3 }}>
         {Array.from({ length: count }, (_, i) => (
           <div key={i} style={{ width: 20, height: 28, borderRadius: 2, background: "linear-gradient(145deg,#1a1520,#120e18)", border: `1px solid ${T.goldDim}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: T.goldDim, animation: `cardDrop 0.3s ease-out ${i * 0.1}s both` }}>?</div>
         ))}
       </div>
-      <span style={{ fontSize: 10, color: T.text, fontFamily: "'Press Start 2P',monospace" }}>×{count}</span>
+      <span style={{ fontSize: 13, color: T.text, fontFamily: "'Press Start 2P',monospace" }}>×{count}</span>
     </div>
   );
 }

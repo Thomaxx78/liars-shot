@@ -9,7 +9,7 @@ import {
 const EMOTES = ["😏", "🤔", "😂", "💀", "🔥", "😱", "👀", "🤡"];
 
 // positions around table for N players (self always at bottom)
-function playerPosition(displayIdx, total, radius = 290) {
+function playerPosition(displayIdx, total, radius = 320) {
   const angle = -Math.PI / 2 - (displayIdx * 2 * Math.PI) / total;
   return { cx: Math.cos(angle) * radius, cy: -Math.sin(angle) * radius };
 }
@@ -384,19 +384,19 @@ export default function OnlineGame({ onBackToMenu }) {
             const isCurrent = cp === p.serverIdx && !showAnn;
             return (
               <div key={p.serverIdx} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: isCurrent ? 8 : 5, opacity: p.connected ? 1 : 0.4, filter: isCurrent ? `drop-shadow(0 0 10px ${PT[p.colorIdx % PT.length].primary}) drop-shadow(0 0 20px ${PT[p.colorIdx % PT.length].primary}80)` : "none", transition: "filter 0.4s" }}>
-                <CowboySprite playerIdx={p.colorIdx % PT.length} size={N > 5 ? 30 : 38} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === p.serverIdx) ? "smirk" : "neutral"} />
-                <span style={{ fontSize: N > 5 ? 5 : 6, fontFamily: "'Press Start 2P'", color: PT[p.colorIdx % PT.length].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>
+                <CowboySprite playerIdx={p.colorIdx % PT.length} size={N > 5 ? 40 : 52} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === p.serverIdx) ? "smirk" : "neutral"} />
+                <span style={{ fontSize: N > 5 ? 7 : 9, fontFamily: "'Press Start 2P'", color: PT[p.colorIdx % PT.length].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>
                   {p.name}{p.serverIdx === myIdx ? " ★" : ""}
                 </span>
-                <span style={{ fontSize: N > 5 ? 7 : 9, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "1px 5px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.handCount}` : "💀"}</span>
+                <span style={{ fontSize: N > 5 ? 9 : 12, color: p.alive ? T.goldBright : T.redBright, fontFamily: "'Press Start 2P'", background: p.alive ? "rgba(0,0,0,0.5)" : "transparent", padding: p.alive ? "2px 6px" : 0, borderRadius: 3, border: p.alive ? `1px solid ${T.goldDim}40` : "none" }}>{p.alive ? `🃏 ${p.handCount}` : "💀"}</span>
                 {p.alive && (
-                  <div style={{ display: "flex", gap: 2 }}>
+                  <div style={{ display: "flex", gap: 3 }}>
                     {Array.from({ length: CHAMBER_COUNT }, (_, ci) => (
-                      <div key={ci} style={{ width: 4, height: 4, borderRadius: "50%", border: `1px solid ${ci < p.chambers ? T.redBright : `${T.textDim}40`}`, background: ci < p.chambers ? T.redBright : "transparent" }} />
+                      <div key={ci} style={{ width: 6, height: 6, borderRadius: "50%", border: `1px solid ${ci < p.chambers ? T.redBright : `${T.textDim}40`}`, background: ci < p.chambers ? T.redBright : "transparent" }} />
                     ))}
                   </div>
                 )}
-                {!p.connected && p.alive && <span style={{ fontSize: 5, color: T.textDim, fontFamily: "'Press Start 2P'" }}>déco</span>}
+                {!p.connected && p.alive && <span style={{ fontSize: 7, color: T.textDim, fontFamily: "'Press Start 2P'" }}>déco</span>}
                 {emotes.filter((e) => e.player === p.serverIdx).map((e) => (
                   <div key={e.id} style={{ position: "absolute", top: -22, fontSize: 22, animation: "fadeInUp 0.3s", zIndex: 50 }}>{e.emote}</div>
                 ))}
@@ -409,18 +409,18 @@ export default function OnlineGame({ onBackToMenu }) {
       {/* Log */}
       <div style={{ position: "absolute", top: 44, left: 8, width: 240, maxHeight: 260, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
         {log.map((l, i) => (
-          <div key={i} style={{ fontSize: 9, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
+          <div key={i} style={{ fontSize: 11, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
       </div>
 
       {/* Deck composition */}
       {deckCounts && (
-        <div style={{ position: "absolute", top: 44, right: 8, width: 130, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 10px" }}>
-          <div style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>DECK</div>
+        <div style={{ position: "absolute", top: 44, right: 8, width: 165, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "8px 12px" }}>
+          <div style={{ fontSize: 7, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 8, textAlign: "center" }}>DECK</div>
           {[["Roi", "♠"], ["Dame", "♥"], ["Valet", "♦"], ["Joker", "🃏"]].map(([type, suit]) => (
-            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
-              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
+            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
+              <span style={{ fontSize: 12, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
             </div>
           ))}
         </div>
@@ -458,7 +458,7 @@ export default function OnlineGame({ onBackToMenu }) {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: "center", fontSize: 8, color: players[cp] ? PT[players[cp].colorIdx % PT.length].primary : T.textDim, fontFamily: "'Press Start 2P'", animation: "blink 1.2s infinite" }}>
+            <div style={{ textAlign: "center", fontSize: 10, color: players[cp] ? PT[players[cp].colorIdx % PT.length].primary : T.textDim, fontFamily: "'Press Start 2P'", animation: "blink 1.2s infinite" }}>
               {players[cp]?.name || "?"} réfléchit...
             </div>
           )}
