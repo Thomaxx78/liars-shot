@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 
 export const CARD_TYPES = ["Roi", "Dame", "Valet"];
-export const ALL_CARDS = ["As", "Roi", "Dame", "Valet"];
-export const CARD_LABELS = { As: "A", Roi: "K", Dame: "Q", Valet: "J" };
-export const CARD_SUITS = { As: "★", Roi: "♠", Dame: "♥", Valet: "♦" };
+export const ALL_CARDS = ["Joker", "Roi", "Dame", "Valet"];
+export const CARD_LABELS = { Joker: "★", Roi: "K", Dame: "Q", Valet: "J" };
+export const CARD_SUITS = { Joker: "★", Roi: "♠", Dame: "♥", Valet: "♦" };
 export const CHAMBER_COUNT = 6;
 
 export const T = {
@@ -54,11 +54,17 @@ export const CSS = `
   *{box-sizing:border-box;margin:0;padding:0}
 `;
 
-export function createDeck() {
+export function createDeck(playerCount) {
+  const handSize = playerCount <= 5 ? 4 : 3;
+  const total = playerCount * handSize;
+  const regularPerType = Math.ceil(total / 4);
+  const jokerCount = total - 3 * regularPerType;
   const d = [];
-  for (let i = 0; i < 5; i++)
-    for (const t of ALL_CARDS)
+  for (let i = 0; i < regularPerType; i++)
+    for (const t of CARD_TYPES)
       d.push({ type: t, id: `${t}_${i}_${Math.random().toString(36).slice(2, 8)}` });
+  for (let i = 0; i < jokerCount; i++)
+    d.push({ type: "Joker", id: `Joker_${i}_${Math.random().toString(36).slice(2, 8)}` });
   return shuffle(d);
 }
 
@@ -72,7 +78,7 @@ export function shuffle(a) {
 }
 
 export function legit(cards, rc) {
-  return cards.every((c) => c.type === rc || c.type === "As");
+  return cards.every((c) => c.type === rc || c.type === "Joker");
 }
 
 // ═══ WESTERN BAR BACKGROUND ═══
@@ -220,18 +226,18 @@ export function CowboySprite({ playerIdx, size = 80, eliminated = false, isCurre
 
 // ═══ CARD ═══
 export function GameCard({ type, faceUp = true, selected = false, onClick, small = false, highlight = false, style: es = {} }) {
-  const w = small ? 38 : 54, h = w * 1.45, isAce = type === "As";
-  const color = type === "Dame" || type === "Valet" ? T.redBright : isAce ? T.goldBright : "#2a2218";
+  const w = small ? 38 : 54, h = w * 1.45, isJoker = type === "Joker";
+  const color = type === "Dame" || type === "Valet" ? T.redBright : isJoker ? T.goldBright : "#2a2218";
   return (
     <div onClick={onClick} style={{ width: w, height: h, borderRadius: 3, position: "relative", cursor: onClick ? "pointer" : "default", transform: selected ? "translateY(-10px) scale(1.06)" : "none", transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s", userSelect: "none", ...es }}>
       <div style={{ position: "absolute", inset: 0, borderRadius: 3, boxShadow: selected ? `0 8px 20px rgba(0,0,0,0.5), 0 0 12px ${T.goldBright}40, inset 0 0 0 2px ${T.goldBright}` : highlight ? `0 3px 8px rgba(0,0,0,0.4), 0 0 6px #2ecc7130, inset 0 0 0 1.5px #2ecc7180` : "0 2px 6px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06)" }} />
       {faceUp ? (
-        <div style={{ width: "100%", height: "100%", borderRadius: 3, background: isAce ? `linear-gradient(135deg,${T.cardFace},#fff8e0,${T.cardFace})` : `linear-gradient(160deg,${T.cardFace},#ece4d0)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Pirata One',serif", overflow: "hidden", position: "relative" }}>
-          <span style={{ position: "absolute", top: 2, left: 3, fontSize: small ? 8 : 10, color, fontFamily: "'Press Start 2P',monospace" }}>{CARD_LABELS[type]}</span>
-          <span style={{ position: "absolute", top: small ? 11 : 13, left: 3, fontSize: small ? 6 : 8, color, opacity: 0.7 }}>{CARD_SUITS[type]}</span>
-          <span style={{ fontSize: small ? 16 : 24, color, textShadow: isAce ? `0 0 8px ${T.goldBright}60` : "none" }}>{CARD_SUITS[type]}</span>
-          {isAce && <span style={{ fontSize: small ? 5 : 6, color: T.goldDim, fontFamily: "'Press Start 2P',monospace", marginTop: 1 }}>JOKER</span>}
-          <span style={{ position: "absolute", bottom: 2, right: 3, fontSize: small ? 8 : 10, color, fontFamily: "'Press Start 2P',monospace", transform: "rotate(180deg)" }}>{CARD_LABELS[type]}</span>
+        <div style={{ width: "100%", height: "100%", borderRadius: 3, background: isJoker ? `linear-gradient(135deg,#1a1520,#2a1a35,#1a1520)` : `linear-gradient(160deg,${T.cardFace},#ece4d0)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Pirata One',serif", overflow: "hidden", position: "relative", border: isJoker ? `1px solid ${T.goldBright}60` : "none" }}>
+          <span style={{ position: "absolute", top: 2, left: 3, fontSize: small ? 8 : 10, color, fontFamily: "'Press Start 2P',monospace" }}>{isJoker ? "J" : CARD_LABELS[type]}</span>
+          <span style={{ position: "absolute", top: small ? 11 : 13, left: 3, fontSize: small ? 6 : 8, color, opacity: 0.7 }}>{isJoker ? "K" : CARD_SUITS[type]}</span>
+          <span style={{ fontSize: small ? 18 : 26, color, textShadow: isJoker ? `0 0 12px ${T.goldBright}80` : "none" }}>{isJoker ? "🃏" : CARD_SUITS[type]}</span>
+          {isJoker && <span style={{ fontSize: small ? 5 : 6, color: T.goldBright, fontFamily: "'Press Start 2P',monospace", marginTop: 2, textShadow: `0 0 6px ${T.goldBright}60` }}>JOKER</span>}
+          <span style={{ position: "absolute", bottom: 2, right: 3, fontSize: small ? 8 : 10, color, fontFamily: "'Press Start 2P',monospace", transform: "rotate(180deg)" }}>{isJoker ? "J" : CARD_LABELS[type]}</span>
         </div>
       ) : (
         <div style={{ width: "100%", height: "100%", borderRadius: 3, background: "linear-gradient(145deg,#1a1520,#120e18)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
@@ -324,7 +330,7 @@ export function WesternAnnouncement({ onComplete, card: forcedCard }) {
         <div style={{ textAlign: "center", animation: "fadeInUp 0.4s ease-out" }}>
           <div style={{ fontSize: 28, color: T.goldBright, textShadow: `0 0 12px ${T.goldBright}50,2px 2px 0 #000`, letterSpacing: 4 }}>{chosen?.toUpperCase()}</div>
           <div style={{ fontSize: 7, color: T.textDim, marginTop: 8, fontFamily: "'Press Start 2P'" }}>Posez des {chosen}s ou bluffez !</div>
-          <div style={{ fontSize: 7, color: T.goldDim, marginTop: 5, fontFamily: "'Press Start 2P'" }}>As ★ = Joker</div>
+          <div style={{ fontSize: 7, color: T.goldDim, marginTop: 5, fontFamily: "'Press Start 2P'" }}>🃏 Joker = Carte universelle</div>
         </div>
       )}
       <div style={{ width: 200, height: 1, background: `linear-gradient(90deg,transparent,${T.goldDim},transparent)`, marginTop: 14 }} />

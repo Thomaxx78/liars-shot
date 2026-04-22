@@ -362,7 +362,7 @@ export default function OnlineGame({ onBackToMenu }) {
             <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", gap: 6, zIndex: 70, animation: "fadeInUp 0.3s", filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.7))" }}>
               {revealed.cards.map((c, i) => (
                 <div key={i} style={{ animation: `revealFlip 0.4s ease-out ${i * 0.12}s both` }}>
-                  <GameCard type={c.type} faceUp small highlight={c.type === roundCard || c.type === "As"} />
+                  <GameCard type={c.type} faceUp small highlight={c.type === roundCard || c.type === "Joker"} />
                 </div>
               ))}
             </div>
@@ -407,7 +407,7 @@ export default function OnlineGame({ onBackToMenu }) {
         <div style={{ padding: "10px 16px 14px", background: "linear-gradient(180deg,rgba(26,18,8,0.3),rgba(26,18,8,0.92))", borderTop: `1px solid ${T.goldDim}12`, zIndex: 10 }}>
           <div style={{ display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
             {myHand.map((c, i) => (
-              <GameCard key={c.id} type={c.type} faceUp selected={sel.includes(i)} highlight={c.type === roundCard || c.type === "As"} onClick={isMyTurn ? () => toggle(i) : undefined} small={myHand.length > 7} />
+              <GameCard key={c.id} type={c.type} faceUp selected={sel.includes(i)} highlight={c.type === roundCard || c.type === "Joker"} onClick={isMyTurn ? () => toggle(i) : undefined} small={myHand.length > 7} />
             ))}
           </div>
           {isMyTurn ? (

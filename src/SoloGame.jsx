@@ -44,8 +44,8 @@ export default function SoloGame({ onBackToMenu }) {
     return n;
   }, []);
   const deal = useCallback((pl) => {
-    const d = createDeck();
     const al = pl.filter((p) => p.alive);
+    const d = createDeck(al.length);
     const per = Math.floor(d.length / al.length);
     let ci = 0;
     return pl.map((p) => {
@@ -166,7 +166,7 @@ export default function SoloGame({ onBackToMenu }) {
     if (!b?.alive || b.hand.length === 0) return;
     setPlayInd(null);
     const rCard = rc || roundCard, cnt = Math.min(1 + Math.floor(Math.random() * 2), b.hand.length);
-    const lg = b.hand.filter((c) => c.type === rCard || c.type === "As");
+    const lg = b.hand.filter((c) => c.type === rCard || c.type === "Joker");
     let ctp;
     if (lg.length >= cnt && Math.random() > 0.2) ctp = lg.slice(0, cnt);
     else ctp = b.hand.slice(0, cnt);
@@ -186,7 +186,7 @@ export default function SoloGame({ onBackToMenu }) {
     if (!b?.alive) return;
     const rCard = rc || roundCard;
     if (lastP !== null && lastP !== bi && lastCards.length > 0) {
-      const own = b.hand.filter((c) => c.type === rCard || c.type === "As").length;
+      const own = b.hand.filter((c) => c.type === rCard || c.type === "Joker").length;
       let sus = 0.15 + lastCards.length * 0.1;
       if (own >= 3) sus += 0.2;
       if (own >= 5) sus += 0.15;
@@ -261,7 +261,7 @@ export default function SoloGame({ onBackToMenu }) {
           </div>
           <div style={{ maxWidth: 330, padding: "10px 18px", border: `1px solid ${T.goldDim}30`, background: "rgba(26,18,8,0.85)", borderRadius: 4, textAlign: "center", fontSize: 12, color: T.textDim, lineHeight: 2 }}>
             Posez la carte annoncée — ou bluffez.<br />
-            Les <span style={{ color: T.goldBright }}>As ★</span> sont des jokers.<br />
+            Les <span style={{ color: T.goldBright }}>🃏 Jokers</span> sont des cartes universelles.<br />
             Si on vous attrape → <span style={{ color: T.redBright }}>roulette russe</span> !
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
@@ -326,7 +326,7 @@ export default function SoloGame({ onBackToMenu }) {
             <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", gap: 6, zIndex: 70, animation: "fadeInUp 0.3s", filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.7))" }}>
               {revealed.cards.map((c, i) => (
                 <div key={i} style={{ animation: `revealFlip 0.4s ease-out ${i * 0.12}s both` }}>
-                  <GameCard type={c.type} faceUp small highlight={c.type === roundCard || c.type === "As"} />
+                  <GameCard type={c.type} faceUp small highlight={c.type === roundCard || c.type === "Joker"} />
                 </div>
               ))}
             </div>
@@ -363,7 +363,7 @@ export default function SoloGame({ onBackToMenu }) {
         <div style={{ padding: "10px 16px 14px", background: "linear-gradient(180deg,rgba(26,18,8,0.3),rgba(26,18,8,0.92))", borderTop: `1px solid ${T.goldDim}12`, zIndex: 10 }}>
           <div style={{ display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
             {human.hand.map((c, i) => (
-              <GameCard key={c.id} type={c.type} faceUp selected={sel.includes(i)} highlight={c.type === roundCard || c.type === "As"} onClick={isMyTurn ? () => toggle(i) : undefined} small={human.hand.length > 7} />
+              <GameCard key={c.id} type={c.type} faceUp selected={sel.includes(i)} highlight={c.type === roundCard || c.type === "Joker"} onClick={isMyTurn ? () => toggle(i) : undefined} small={human.hand.length > 7} />
             ))}
           </div>
           {isMyTurn ? (

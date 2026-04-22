@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const CARD_TYPES = ["Roi", "Dame", "Valet"];
-const ALL_CARDS = ["As", "Roi", "Dame", "Valet"];
+const ALL_CARDS = ["Joker", "Roi", "Dame", "Valet"];
 const CHAMBER_COUNT = 6;
 const MAX_PLAYERS = 8;
 const MIN_PLAYERS = 2;
@@ -20,16 +20,22 @@ function shuffle(a) {
   return b;
 }
 
-function createDeck() {
+function createDeck(playerCount) {
+  const handSize = playerCount <= 5 ? 4 : 3;
+  const total = playerCount * handSize;
+  const regularPerType = Math.ceil(total / 4);
+  const jokerCount = total - 3 * regularPerType;
   const d = [];
-  for (let i = 0; i < 5; i++)
-    for (const t of ALL_CARDS)
+  for (let i = 0; i < regularPerType; i++)
+    for (const t of CARD_TYPES)
       d.push({ type: t, id: `${t}_${i}_${Math.random().toString(36).slice(2, 8)}` });
+  for (let i = 0; i < jokerCount; i++)
+    d.push({ type: "Joker", id: `Joker_${i}_${Math.random().toString(36).slice(2, 8)}` });
   return shuffle(d);
 }
 
 function legit(cards, rc) {
-  return cards.every((c) => c.type === rc || c.type === "As");
+  return cards.every((c) => c.type === rc || c.type === "Joker");
 }
 
 function aliveCount(players) {
@@ -47,8 +53,8 @@ function nextAlive(from, players) {
 }
 
 function dealCards(players) {
-  const deck = createDeck();
   const alive = players.filter((p) => p.alive);
+  const deck = createDeck(alive.length);
   const per = Math.floor(deck.length / alive.length);
   let ci = 0;
   return players.map((p) => {
