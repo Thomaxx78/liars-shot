@@ -39,12 +39,21 @@ export default function OnlineGame({ onBackToMenu }) {
   const [playInd, setPlayInd] = useState(null);
   const [rouletteInfo, setRouletteInfo] = useState(null); // { playerIdx, spentChambers, hit }
   const [emotes, setEmotes] = useState([]);
+  const [deckCounts, setDeckCounts] = useState(null);
   const [showEm, setShowEm] = useState(false);
   const [winner, setWinner] = useState(null); // { idx, name }
   const myIdxRef = useRef(null);
 
   // keep ref in sync for use in socket callbacks
   useEffect(() => { myIdxRef.current = myIdx; }, [myIdx]);
+
+  const computeDeckCounts = useCallback((ps) => {
+    const n = ps.players.filter((p) => p.alive).length;
+    const handSize = n <= 5 ? 4 : 3;
+    const total = n * handSize;
+    const reg = Math.ceil(total / 4);
+    return { Roi: reg, Dame: reg, Valet: reg, Joker: total - 3 * reg };
+  }, []);
 
   const applyPublicState = useCallback((ps) => {
     if (!ps) return;
@@ -80,6 +89,7 @@ export default function OnlineGame({ onBackToMenu }) {
       myIdxRef.current = yourIdx;
       setMyHand(yourHand);
       applyPublicState(ps);
+      setDeckCounts(computeDeckCounts(ps));
       setSel([]);
       setRevealed(null);
       setPlayInd(null);
@@ -119,6 +129,7 @@ export default function OnlineGame({ onBackToMenu }) {
     socket.on("round_start", ({ yourHand, roundCard: rc, publicState: ps }) => {
       setMyHand(yourHand);
       applyPublicState(ps);
+      setDeckCounts(computeDeckCounts(ps));
       setSel([]);
       setRevealed(null);
       setPlayInd(null);
@@ -396,11 +407,24 @@ export default function OnlineGame({ onBackToMenu }) {
       </div>
 
       {/* Log */}
-      <div style={{ position: "absolute", top: 44, left: 8, width: 230, maxHeight: 240, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.25)", borderRadius: 4, padding: "4px 6px" }}>
+      <div style={{ position: "absolute", top: 44, left: 8, width: 240, maxHeight: 260, overflow: "hidden", zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 8px" }}>
         {log.map((l, i) => (
-          <div key={i} style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldDim : l.includes("💀") ? T.redBright : T.textDim, lineHeight: 2.2, animation: "slideInLog 0.3s", opacity: 0.3 + (i / log.length) * 0.7, textShadow: "1px 1px 0 #000" }}>{l}</div>
+          <div key={i} style={{ fontSize: 9, fontFamily: "'Press Start 2P'", color: l.includes("═══") ? T.goldBright : l.includes("💀") ? T.redBright : T.text, lineHeight: 2.4, animation: "slideInLog 0.3s", opacity: 0.4 + (i / log.length) * 0.6, textShadow: "1px 1px 0 #000" }}>{l}</div>
         ))}
       </div>
+
+      {/* Deck composition */}
+      {deckCounts && (
+        <div style={{ position: "absolute", top: 44, right: 8, width: 130, zIndex: 10, background: "rgba(0,0,0,0.55)", border: `1px solid ${T.goldDim}20`, borderRadius: 5, padding: "6px 10px" }}>
+          <div style={{ fontSize: 6, fontFamily: "'Press Start 2P'", color: T.goldDim, letterSpacing: 2, marginBottom: 6, textAlign: "center" }}>DECK</div>
+          {[["Roi", "♠"], ["Dame", "♥"], ["Valet", "♦"], ["Joker", "🃏"]].map(([type, suit]) => (
+            <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span style={{ fontSize: 8, fontFamily: "'Press Start 2P'", color: type === "Dame" || type === "Valet" ? T.redBright : type === "Joker" ? T.goldBright : T.text }}>{suit} {type}</span>
+              <span style={{ fontSize: 10, fontFamily: "'Press Start 2P'", color: T.goldBright, textShadow: `0 0 6px ${T.goldBright}60` }}>×{deckCounts[type]}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Hand & controls */}
       {players[myIdx]?.alive && !showAnn && roundCard && !rouletteInfo && (
