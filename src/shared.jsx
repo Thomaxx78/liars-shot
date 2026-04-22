@@ -218,7 +218,7 @@ export function CowboySprite({ playerIdx, size = 80, eliminated = false, isCurre
         )}
       </svg>
       {isCurrent && !eliminated && (
-        <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", fontSize: 14, color: T.gold, animation: "bounceArrow 1s ease-in-out infinite", textShadow: `0 0 6px ${T.goldBright}60` }}>▼</div>
+        <div style={{ position: "absolute", top: -18, left: "50%", transform: "translateX(-50%)", fontSize: 22, color: T.goldBright, animation: "bounceArrow 0.7s ease-in-out infinite", textShadow: `0 0 12px ${T.goldBright}, 0 0 24px ${T.goldBright}80` }}>▼</div>
       )}
     </div>
   );
@@ -279,7 +279,7 @@ export function TablePile({ cards, roundCard }) {
           </div>
         ))}
       </div>
-      {cards.length > 0 && <span style={{ fontFamily: "'Press Start 2P'", fontSize: 6, color: T.textDim }}>{cards.length}</span>}
+      {cards.length > 0 && <span style={{ fontFamily: "'Press Start 2P'", fontSize: 14, color: T.goldBright, textShadow: `0 0 8px ${T.goldBright}60`, letterSpacing: 1 }}>{cards.length}</span>}
     </div>
   );
 }

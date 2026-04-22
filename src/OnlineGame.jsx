@@ -8,9 +8,9 @@ import {
 
 const EMOTES = ["😏", "🤔", "😂", "💀", "🔥", "😱", "👀", "🤡"];
 
-// positions around table for N players (self always at angle π/2 = top)
+// positions around table for N players (self always at bottom)
 function playerPosition(displayIdx, total, radius = 290) {
-  const angle = Math.PI / 2 - (displayIdx * 2 * Math.PI) / total;
+  const angle = -Math.PI / 2 - (displayIdx * 2 * Math.PI) / total;
   return { cx: Math.cos(angle) * radius, cy: -Math.sin(angle) * radius };
 }
 
@@ -372,7 +372,7 @@ export default function OnlineGame({ onBackToMenu }) {
             const { cx, cy } = playerPosition(p.displayIdx, N);
             const isCurrent = cp === p.serverIdx && !showAnn;
             return (
-              <div key={p.serverIdx} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: 5, opacity: p.connected ? 1 : 0.4 }}>
+              <div key={p.serverIdx} style={{ position: "absolute", left: `calc(50% + ${cx}px)`, top: `calc(50% + ${cy}px)`, transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, zIndex: isCurrent ? 8 : 5, opacity: p.connected ? 1 : 0.4, filter: isCurrent ? `drop-shadow(0 0 10px ${PT[p.colorIdx % PT.length].primary}) drop-shadow(0 0 20px ${PT[p.colorIdx % PT.length].primary}80)` : "none", transition: "filter 0.4s" }}>
                 <CowboySprite playerIdx={p.colorIdx % PT.length} size={N > 5 ? 30 : 38} eliminated={!p.alive} isCurrent={isCurrent} emotion={emotes.some((e) => e.player === p.serverIdx) ? "smirk" : "neutral"} />
                 <span style={{ fontSize: N > 5 ? 5 : 6, fontFamily: "'Press Start 2P'", color: PT[p.colorIdx % PT.length].primary, textShadow: "1px 1px 0 #000", opacity: p.alive ? 1 : 0.3 }}>
                   {p.name}{p.serverIdx === myIdx ? " ★" : ""}
