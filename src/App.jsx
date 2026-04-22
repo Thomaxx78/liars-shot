@@ -1337,10 +1337,10 @@ export default function LiarsShot() {
 				<div
 					ref={tableRef}
 					style={{
-						width: 340,
-						height: 340,
-						maxWidth: "86vw",
-						maxHeight: "50vh",
+						width: 740,
+						height: 740,
+						maxWidth: "96vw",
+						maxHeight: "78vh",
 						borderRadius: "50%",
 						background: `radial-gradient(ellipse at 45% 40%,${T.table},${T.tableDark} 65%,#081a0c)`,
 						border: `8px solid ${T.rim}`,
@@ -1389,8 +1389,8 @@ export default function LiarsShot() {
 
 					{players.map((p, i) => {
 						const a = [Math.PI / 2, Math.PI, -Math.PI / 2, 0][i];
-						const cx = Math.cos(a) * 130,
-							cy = -Math.sin(a) * 130;
+						const cx = Math.cos(a) * 300,
+							cy = -Math.sin(a) * 300;
 						return (
 							<div
 								key={i}
